@@ -1,19 +1,38 @@
 version: '3'
 
 services:
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
-      - .:/app
+      - ./backend:/code
     ports:
       - "8000:8000"
     depends_on:
       - db
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+
   db:
     image: postgres:13
+    container_name: db
     environment:
-      POSTGRES_DB: pageturnerdatabase
-      POSTGRES_USER: pageturneruser
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: mydatabaseuser
       POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:
